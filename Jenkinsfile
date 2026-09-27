@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = "hemanathan18/devops-python-app"
+        EC2_HOST = "44.198.55.1"
     }
     stages {
         stage ('Checkout') {
@@ -42,13 +43,16 @@ pipeline {
         }
         stage('Deploy to EC2') {
             steps {
-                sh '''
-                #ssh -o StrictHostKeyChecking=no ubuntu@<EC2_PUBLIC_IP> << EOF
-                #docker pull $DOCKER_IMAGE:latest
-                docker stop python-app || true
-                docker rm python-app || true
-                docker run -d -p 5000:5000 --name python-app $DOCKER_IMAGE:latest
-                '''
+                sshagent(['EC2-SSH']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@<EC2_HOST> << EOF
+                    docker pull $DOCKER_IMAGE:latest
+                    docker stop python-app || true
+                    docker rm python-app || true
+                    docker run -d -p 5000:5000 --name python-app $DOCKER_IMAGE:latest
+                    EOF
+                    '''
+                }
             }
         }
     }
@@ -57,14 +61,14 @@ pipeline {
             emailext(
                 subject: "Jenkins Build Successful !",
                 body: "Jenkins CICD-Project-pipeline completed successfully.",
-                to: "hemeenufradus18180@gmail.com" 
+                to: "hemanathan18180@gmail.com" 
             ) 
         }
         failure {
             emailext(
                 subject: "Jenkins Build Failed !!",
                 body: "Jenkins CICD-Project-pipeline failed. Please check logs.",
-                to: "hemeenufradus18180@gmail.com"
+                to: "hemanathan18180@gmail.com"
             )
         }
     }
