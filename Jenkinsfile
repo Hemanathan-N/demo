@@ -45,12 +45,12 @@ pipeline {
             steps {
                 sshagent(['EC2-SSH']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@$EC2_HOST << EOF
+                    ssh -o StrictHostKeyChecking=no ubuntu@$EC2_HOST "
                     docker pull $DOCKER_IMAGE:latest
                     docker stop python-app || true
                     docker rm python-app || true
                     docker run -d -p 5000:5000 --name python-app $DOCKER_IMAGE:latest
-                    EOF
+                    "
                     '''
                 }
             }
