@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = "hemanathan18/devops-python-app"
-        EC2_HOST = "44.198.55.1"
+        EC2_HOST = "3.231.147.155"
     }
     stages {
         stage ('Checkout') {
